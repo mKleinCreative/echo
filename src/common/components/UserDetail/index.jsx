@@ -75,6 +75,8 @@ class UserDetail extends Component {
                 <div>Phase</div>
                 <div>Joined</div>
                 <div>Updated</div>
+                <div><span>&nbsp;</span></div>
+                <div>Active</div>
               </Flex>
               <Flex className={styles.listRightCol} flexDirection="column">
                 <div><span>&nbsp;</span></div>
@@ -85,6 +87,8 @@ class UserDetail extends Component {
                 <div>{user.phase ? user.phase.number : '--'}</div>
                 <div>{moment(user.createdAt).format('MMM DD, YYYY') || '--'}</div>
                 <div>{moment(user.updatedAt).format('MMM DD, YYYY') || '--'}</div>
+                <div><span>&nbsp;</span></div>
+                <div>{user.active ? 'Yes' : 'No'}</div>
               </Flex>
             </Flex>
           </Flex>
