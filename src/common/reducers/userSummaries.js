@@ -2,6 +2,9 @@ import {
   DEACTIVATE_USER_REQUEST,
   DEACTIVATE_USER_SUCCESS,
   DEACTIVATE_USER_FAILURE,
+  REACTIVATE_USER_REQUEST,
+  REACTIVATE_USER_SUCCESS,
+  REACTIVATE_USER_FAILURE,
   GET_USER_SUMMARY_REQUEST,
   GET_USER_SUMMARY_SUCCESS,
   GET_USER_SUMMARY_FAILURE,
@@ -44,6 +47,19 @@ export default function userSummaries(state = initialState, action) {
         isBusy: false,
       })
     case DEACTIVATE_USER_FAILURE:
+      return Object.assign({}, state, {
+        isBusy: false,
+      })
+
+    case REACTIVATE_USER_REQUEST:
+      return Object.assign({}, state, {
+        isBusy: true,
+      })
+    case REACTIVATE_USER_SUCCESS:
+      return Object.assign({}, state, {
+        isBusy: false,
+      })
+    case REACTIVATE_USER_FAILURE:
       return Object.assign({}, state, {
         isBusy: false,
       })

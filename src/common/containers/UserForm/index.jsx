@@ -7,6 +7,7 @@ import {
   findUsers,
   updateUser,
   deactivateUser,
+  reactivateUser,
 } from 'src/common/actions/user'
 import {findPhases} from 'src/common/actions/phase'
 import {userSchema, asyncValidate} from 'src/common/validations'
@@ -36,8 +37,9 @@ class UserFormContainer extends Component {
     const {user, currentUser} = this.props
 
     const canBeDeactivated = user.active && userCan(currentUser, 'deactivateUser')
+    const canBeReactivated = !user.active && userCan(currentUser, 'reactivateUser')
 
-    return <UserForm {...this.props} canBeDeactivated={canBeDeactivated}/>
+    return <UserForm {...this.props} canBeDeactivated={canBeDeactivated} canBeReactivated={canBeReactivated}/>
   }
 }
 
@@ -51,6 +53,7 @@ UserFormContainer.propTypes = {
   user: PropTypes.object,
   currentUser: PropTypes.object,
   onDeactivateUser: PropTypes.func.isRequired,
+  onReactivateUser: PropTypes.func.isRequired,
 }
 
 UserFormContainer.fetchData = fetchData
@@ -110,6 +113,7 @@ function mapDispatchToProps(dispatch, props) {
     showLoad: () => dispatch(showLoad()),
     hideLoad: () => dispatch(hideLoad()),
     onDeactivateUser: id => dispatch(deactivateUser(id)),
+    onReactivateUser: id => dispatch(reactivateUser(id)),
   }
 }
 

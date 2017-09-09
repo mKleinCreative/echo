@@ -19,8 +19,12 @@ class UserForm extends Component {
     this.showDeactivateUserDialog = this.showDeactivateUserDialog.bind(this)
     this.hideDeactivateUserDialog = this.hideDeactivateUserDialog.bind(this)
     this.handleDeactivateUser = this.handleDeactivateUser.bind(this)
+    this.showReactivateUserDialog = this.showReactivateUserDialog.bind(this)
+    this.hideReactivateUserDialog = this.hideReactivateUserDialog.bind(this)
+    this.handleReactivateUser = this.handleReactivateUser.bind(this)
     this.state = {
       showingDeactivateUserDialog: false,
+      showingReactivateUserDialog: false
     }
   }
 
@@ -39,11 +43,27 @@ class UserForm extends Component {
     this.setState({showingDeactivateUserDialog: false})
   }
 
+  showReactivateUserDialog() {
+    this.setState({showingReactivateUserDialog: true})
+  }
+
+  hideReactivateUserDialog() {
+    this.setState({showingReactivateUserDialog: false})
+  }
+
   handleDeactivateUser() {
     const {onDeactivateUser} = this.props
     onDeactivateUser(this.props.user.id)
     this.setState({
       showingDeactivateUserDialog: false
+    })
+  }
+
+  handleReactivateUser() {
+    const {onReactivateUser} = this.props
+    onReactivateUser(this.props.user.id)
+    this.setState({
+      showingReactivateUserDialog: false
     })
   }
 
@@ -58,6 +78,7 @@ class UserForm extends Component {
       user,
       phaseOptions,
       canBeDeactivated,
+      canBeReactivated,
     } = this.props
 
     if (formType === FORM_TYPES.NOT_FOUND) {
@@ -81,11 +102,35 @@ class UserForm extends Component {
       </ConfirmationDialog>
     ) : null
 
+    const reactivateUserDialog = canBeReactivated ? (
+      <ConfirmationDialog
+        active={this.state.showingReactivateUserDialog}
+        confirmLabel="Yes, Reactivate"
+        onClickCancel={this.hideReactivateUserDialog}
+        onClickConfirm={this.handleReactivateUser}
+        title=" "
+        >
+        <Flex justifyContent="center" alignItems="center">
+          Are you sure you want to reactivate {user.name} ({user.handle})?
+        </Flex>
+      </ConfirmationDialog>
+    ) : null
+
     const deactivateUserButton = canBeDeactivated ? (
       <WrappedButton
         label="Deactivate"
         disabled={false}
         onClick={this.showDeactivateUserDialog}
+        accent
+        raised
+        />
+      ) : null
+
+    const reactivateUserButton = canBeReactivated ? (
+      <WrappedButton
+        label="Reactivate"
+        disabled={false}
+        onClick={this.showReactivateUserDialog}
         accent
         raised
         />
@@ -112,6 +157,7 @@ class UserForm extends Component {
             />
           <Flex className={styles.footer} justifyContent="space-between">
             {deactivateUserButton}
+            {reactivateUserButton}
             <Button
               type="submit"
               label="Save"
@@ -122,6 +168,7 @@ class UserForm extends Component {
           </Flex>
         </form>
         {deactivateUserDialog}
+        {reactivateUserDialog}
       </Flex>
     )
   }
@@ -141,7 +188,9 @@ UserForm.propTypes = {
     name: PropTypes.string,
   }),
   onDeactivateUser: PropTypes.func.isRequired,
+  onReactivateUser: PropTypes.func.isRequired,
   canBeDeactivated: PropTypes.bool.isRequired,
+  canBeReactivated: PropTypes.bool.isRequired,
 }
 
 export default UserForm

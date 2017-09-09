@@ -44,6 +44,27 @@ export function deactivateUser(id) {
   }
 }
 
+export function reactivateUser(id) {
+  return {
+    types: [
+      types.REACTIVATE_USER_REQUEST,
+      types.REACTIVATE_USER_SUCCESS,
+      types.REACTIVATE_USER_FAILURE,
+    ],
+    shouldCallAPI: () => true,
+    callAPI: (dispatch, getState) => {
+      const query = {
+        query: 'mutation ($memberId: ID!) { reactivateUser(identifier: $memberId) { id active handle } }',
+        variables: {memberId: id},
+      }
+      return getGraphQLFetcher(dispatch, getState().auth)(query)
+        .then(graphQLResponse => graphQLResponse.data.reactivateUser)
+    },
+    payload: {},
+    redirect: user => (user && user.handle ? `/users/${user.handle}` : '/users'),
+  }
+}
+
 export function findMembers(options = {}) {
   return (dispatch, getState) => {
     const action = {
