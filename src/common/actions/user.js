@@ -40,6 +40,7 @@ export function deactivateUser(id) {
         .then(graphQLResponse => graphQLResponse.data.deactivateUser)
     },
     payload: {},
+    redirect: user => (user && user.handle ? `/users/${user.handle}` : '/users'),
   }
 }
 

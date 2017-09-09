@@ -40,17 +40,9 @@ export default function userSummaries(state = initialState, action) {
         isBusy: true,
       })
     case DEACTIVATE_USER_SUCCESS:
-      {
-        const userAttrs = action.response || {}
-        const userSummary = state.userSummaries[userAttrs.id] || {}
-        const user = Object.assign({}, userSummary.user, userAttrs)
-        const newUserSummary = Object.assign({}, userSummary, {user})
-        const userSummaries = Object.assign({}, state.userSummaries, {[user.id]: newUserSummary})
-        return Object.assign({}, state, {
-          isBusy: false,
-          userSummaries,
-        })
-      }
+      return Object.assign({}, state, {
+        isBusy: false,
+      })
     case DEACTIVATE_USER_FAILURE:
       return Object.assign({}, state, {
         isBusy: false,

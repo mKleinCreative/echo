@@ -4,7 +4,6 @@ import moment from 'moment-timezone'
 import {Tab, Tabs} from 'react-toolbox'
 import Helmet from 'react-helmet'
 
-import ConfirmationDialog from 'src/common/components/ConfirmationDialog'
 import WrappedButton from 'src/common/components/WrappedButton'
 import ContentSidebar from 'src/common/components/ContentSidebar'
 import UserProjectSummary from 'src/common/components/UserProjectSummary'
@@ -22,28 +21,11 @@ class UserDetail extends Component {
     this.renderTabs = this.renderTabs.bind(this)
     this.renderProjects = this.renderProjects.bind(this)
     this.handleChangeTab = this.handleChangeTab.bind(this)
-    this.showDeactivateUserDialog = this.showDeactivateUserDialog.bind(this)
-    this.hideDeactivateUserDialog = this.hideDeactivateUserDialog.bind(this)
-    this.handleDeactivateUser = this.handleDeactivateUser.bind(this)
-    this.state = {tabIndex: 0, showingDeactivateUserDialog: false}
-  }
-
-  showDeactivateUserDialog() {
-    this.setState({showingDeactivateUserDialog: true})
-  }
-
-  hideDeactivateUserDialog() {
-    this.setState({showingDeactivateUserDialog: false})
+    this.state = {tabIndex: 0}
   }
 
   handleChangeTab(tabIndex) {
     this.setState({tabIndex})
-  }
-
-  handleDeactivateUser() {
-    const {onDeactivateUser} = this.props
-    onDeactivateUser(this.props.user.id)
-    this.setState({showingDeactivateUserDialog: false})
   }
 
   renderSidebar() {
@@ -61,32 +43,7 @@ class UserDetail extends Component {
       </a>
     ) : null
 
-    const canBeDeactivated = user.active && userCan(currentUser, 'deactivateUser')
     const canBeEdited = userCan(currentUser, 'updateUser')
-
-    const deactivateUserDialog = canBeDeactivated ? (
-      <ConfirmationDialog
-        active={this.state.showingDeactivateUserDialog}
-        confirmLabel="Yes, Deactivate"
-        onClickCancel={this.hideDeactivateUserDialog}
-        onClickConfirm={this.handleDeactivateUser}
-        title=" "
-        >
-        <Flex justifyContent="center" alignItems="center">
-          Are you sure you want to deactivate {user.name} ({user.handle})?
-        </Flex>
-      </ConfirmationDialog>
-    ) : null
-
-    const deactivateUserButton = canBeDeactivated ? (
-      <WrappedButton
-        label="Deactivate"
-        disabled={false}
-        onClick={this.showDeactivateUserDialog}
-        accent
-        raised
-        />
-      ) : <div/>
 
     const editUserButton = canBeEdited ? (
       <WrappedButton
@@ -132,11 +89,9 @@ class UserDetail extends Component {
             </Flex>
           </Flex>
           <Flex className={styles.controls}>
-            {deactivateUserButton}
             {editUserButton}
           </Flex>
         </div>
-        {deactivateUserDialog}
       </ContentSidebar>
     )
   }
@@ -210,7 +165,6 @@ UserDetail.propTypes = {
   }),
   userProjectSummaries: PropTypes.array,
   navigate: PropTypes.func.isRequired,
-  onDeactivateUser: PropTypes.func.isRequired,
   onClickEdit: PropTypes.func.isRequired,
   defaultAvatarURL: PropTypes.string,
 }
