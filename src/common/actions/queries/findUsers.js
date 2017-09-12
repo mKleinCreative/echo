@@ -20,6 +20,7 @@ export default function findUsers(identifiers) {
           }
           createdAt
           updatedAt
+          roles
         }
       }
     `,

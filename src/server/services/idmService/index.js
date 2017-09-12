@@ -4,6 +4,7 @@ import {default as findUsers} from './findUsers'
 import {default as getUser} from './getUser'
 import {default as getUsersByHandles} from './getUsersByHandles'
 import {default as getUsersByIds} from './getUsersByIds'
+import {default as updateUser} from './updateUser'
 
 /**
 * NOTE: this service's functions are exported the way they are to enable
@@ -17,4 +18,5 @@ export default {
   getUser,
   getUsersByHandles,
   getUsersByIds,
+  updateUser,
 }

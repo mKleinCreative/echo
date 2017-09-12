@@ -14,6 +14,7 @@ import {userSchema, asyncValidate} from 'src/common/validations'
 import UserForm from 'src/common/components/UserForm'
 import {findAny, userCan} from 'src/common/util'
 import {FORM_TYPES} from 'src/common/util/form'
+import {USER_ROLES} from 'src/common/models/user'
 
 const FORM_NAME = 'user'
 
@@ -89,6 +90,7 @@ function mapStateToProps(state, props) {
   const initialValues = user ? {
     id: user.id,
     phaseNumber: user.phase ? user.phase.number : null,
+    roles: user.roles
   } : null
 
   return {
@@ -99,6 +101,7 @@ function mapStateToProps(state, props) {
     user,
     initialValues,
     currentUser: auth.currentUser,
+    availableRoles: USER_ROLES,
   }
 }
 
