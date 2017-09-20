@@ -79,7 +79,7 @@ class UserForm extends Component {
       phaseOptions,
       canBeDeactivated,
       canBeReactivated,
-      availableRoles,
+      roleOptions,
     } = this.props
 
     if (formType === FORM_TYPES.NOT_FOUND) {
@@ -163,7 +163,7 @@ class UserForm extends Component {
             icon="lock"
             name="roles"
             component={renderCheckboxes}
-            labels={availableRoles}
+            labels={roleOptions}
             />
           <Flex className={styles.footer} justifyContent="space-between">
             {deactivateUserButton}
@@ -201,7 +201,7 @@ UserForm.propTypes = {
   onReactivateUser: PropTypes.func.isRequired,
   canBeDeactivated: PropTypes.bool.isRequired,
   canBeReactivated: PropTypes.bool.isRequired,
-  availableRoles: PropTypes.array,
+  roleOptions: PropTypes.array,
 }
 
 export default UserForm

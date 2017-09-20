@@ -101,7 +101,7 @@ function mapStateToProps(state, props) {
     user,
     initialValues,
     currentUser: auth.currentUser,
-    availableRoles: USER_ROLES,
+    roleOptions: USER_ROLES,
   }
 }
 
