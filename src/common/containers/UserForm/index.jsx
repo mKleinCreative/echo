@@ -36,8 +36,8 @@ class UserFormContainer extends Component {
 
     const {user, currentUser} = this.props
 
-    const canBeDeactivated = user.active && userCan(currentUser, 'deactivateUser')
-    const canBeReactivated = !user.active && userCan(currentUser, 'reactivateUser')
+    const canBeDeactivated = Boolean(user) && user.active === true && userCan(currentUser, 'deactivateUser')
+    const canBeReactivated = Boolean(user) && user.active === false && userCan(currentUser, 'reactivateUser')
 
     return <UserForm {...this.props} canBeDeactivated={canBeDeactivated} canBeReactivated={canBeReactivated}/>
   }
