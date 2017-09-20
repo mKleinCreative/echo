@@ -6,6 +6,8 @@ export default function updateUser(values) {
         updateUser(values: $values) {
           id
           handle
+          roles
+          active
           updatedAt
         }
       }

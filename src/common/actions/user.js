@@ -142,7 +142,10 @@ export function updateUser(values) {
       return getGraphQLFetcher(dispatch, getState().auth)(mutation)
         .then(graphQLResponse => graphQLResponse.data.updateUser)
     },
-    redirect: user => (user && user.handle ? `/users/${user.handle}` : '/users'),
+    redirect: user => {
+      const identifier = user ? (user.handle || user.id) : null
+      return identifier ? `/users/${identifier}` : '/users'
+    },
     payload: {},
   }
 }

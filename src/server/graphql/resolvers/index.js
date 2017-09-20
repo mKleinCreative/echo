@@ -39,7 +39,9 @@ export async function resolvePhaseCurrentProjects(phaseSummary, args, {rootValue
   if (!currentMember || !currentMember.chapterId) {
     throw new LGNotAuthorizedError('Must be a member of a chapter to view current phase projects')
   }
-  return findActiveProjectsForChapter(currentMember.chapterId, {filter: {phaseId: phaseSummary.phase.id}})
+  return _safeResolveAsync(
+    findActiveProjectsForChapter(currentMember.chapterId, {filter: {phaseId: phaseSummary.phase.id}})
+  ) || []
 }
 
 export async function resolvePhaseCurrentMembers(phaseSummary) {
@@ -93,7 +95,8 @@ export async function resolveFindProjectsForCycle(source, args = {}, {rootValue:
     (await getLatestCycleForChapter(currentChapter.id))
 
   if (!cycle) {
-    throw new LGBadRequestError(`Cycle not found for chapter ${currentChapter.name}`)
+    console.warn(`Cycle not found for chapter ${currentChapter.name}`)
+    return []
   }
 
   let projects = await Project.filter({cycleId: cycle.id})
@@ -257,7 +260,7 @@ async function _safeResolveAsync(query) {
   try {
     return await query
   } catch (err) {
-    console.error(err)
+    console.warn(err.message)
     return null
   }
 }
