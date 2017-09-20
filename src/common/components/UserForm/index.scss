@@ -5,3 +5,20 @@
 .footer {
   margin-top: 20px;
 }
+
+.icon {
+  width: 4.8rem;
+  height: 4.8rem;
+  font-size: 2.4rem !important;
+  line-height: 4.8rem !important;
+  color: rgba(0, 0, 0, 0.26);
+  text-align: center;
+}
+
+.roles-container {
+  padding: 2rem 0;
+}
+
+.checkbox:last-child {
+  margin-bottom: 0;
+}

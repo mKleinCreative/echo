@@ -3,7 +3,6 @@ import {GraphQLNonNull} from 'graphql'
 import {userCan} from 'src/common/util'
 import {UserProfile, InputUser} from 'src/server/graphql/schemas'
 import updateUser from 'src/server/actions/updateUser'
-import getUser from 'src/server/actions/getUser'
 import {LGNotAuthorizedError} from 'src/server/util/error'
 
 export default {
@@ -16,7 +15,6 @@ export default {
       throw new LGNotAuthorizedError()
     }
 
-    await updateUser(values)
-    return await getUser(values.id)
+    return updateUser(values.id, values)
   }
 }

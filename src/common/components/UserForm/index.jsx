@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-handler-names */
 import React, {Component, PropTypes} from 'react'
 import Button from 'react-toolbox/lib/button'
-import {Field} from 'redux-form'
+import {Field, FieldArray} from 'redux-form'
 import Helmet from 'react-helmet'
 
 import ContentHeader from 'src/common/components/ContentHeader'
@@ -9,7 +9,7 @@ import NotFound from 'src/common/components/NotFound'
 import {Flex} from 'src/common/components/Layout'
 import WrappedButton from 'src/common/components/WrappedButton'
 import ConfirmationDialog from 'src/common/components/ConfirmationDialog'
-import {FORM_TYPES, renderDropdown} from 'src/common/util/form'
+import {FORM_TYPES, renderDropdown, renderCheckboxes} from 'src/common/util/form'
 
 import styles from './index.scss'
 
@@ -79,6 +79,7 @@ class UserForm extends Component {
       phaseOptions,
       canBeDeactivated,
       canBeReactivated,
+      roleOptions,
     } = this.props
 
     if (formType === FORM_TYPES.NOT_FOUND) {
@@ -155,6 +156,15 @@ class UserForm extends Component {
             component={renderDropdown}
             onBlur={this.handleBlurField}
             />
+          <FieldArray
+            className={styles['roles-container']}
+            iconStyle={styles.icon}
+            checkBoxStyle={styles.checkbox}
+            icon="lock"
+            name="roles"
+            component={renderCheckboxes}
+            labels={roleOptions}
+            />
           <Flex className={styles.footer} justifyContent="space-between">
             {deactivateUserButton}
             {reactivateUserButton}
@@ -191,6 +201,7 @@ UserForm.propTypes = {
   onReactivateUser: PropTypes.func.isRequired,
   canBeDeactivated: PropTypes.bool.isRequired,
   canBeReactivated: PropTypes.bool.isRequired,
+  roleOptions: PropTypes.array,
 }
 
 export default UserForm
