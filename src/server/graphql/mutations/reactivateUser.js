@@ -15,6 +15,6 @@ export default {
       throw new LGNotAuthorizedError('You are not authorized to reactivate users.')
     }
 
-    return await reactivateUser(identifier)
+    return reactivateUser(identifier)
   }
 }

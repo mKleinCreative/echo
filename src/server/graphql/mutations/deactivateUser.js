@@ -15,6 +15,6 @@ export default {
       throw new LGNotAuthorizedError('You are not authorized to deactivate users.')
     }
 
-    return await deactivateUser(identifier)
+    return deactivateUser(identifier)
   }
 }
