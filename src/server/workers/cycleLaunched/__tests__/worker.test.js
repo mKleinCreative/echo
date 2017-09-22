@@ -24,7 +24,7 @@ describe(testContext(__filename), function () {
 
       it('automatically creates single-member projects for users in non-voting phases', async function () {
         const practiceGoalNumber = 1
-        const phase = await factory.create('phase', {number: 1, practiceGoalNumber})
+        const phase = await factory.create('phase', {number: 100, practiceGoalNumber})
         const phaseMembers = await factory.createMany('member', {chapterId: this.chapter.id, phaseId: phase.id}, 2)
 
         useFixture.nockClean()

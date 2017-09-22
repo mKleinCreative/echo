@@ -4,7 +4,7 @@ import generateProjectName from 'src/server/actions/generateProjectName'
 import sendCycleLaunchAnnouncements from 'src/server/actions/sendCycleLaunchAnnouncements'
 import {formProjectsIfNoneExist} from 'src/server/actions/formProjects'
 import {getGoalInfo} from 'src/server/services/goalLibraryService'
-import {Phase, Member, Project} from 'src/server/services/dataService'
+import {r, Phase, Member, Project} from 'src/server/services/dataService'
 
 export function start() {
   const jobService = require('src/server/services/jobService')
@@ -30,7 +30,10 @@ export async function processCycleLaunched(cycle) {
 async function _createProjectsInCycleForNonVotingPhases(cycle) {
   console.log('Automatically creating projects for non-voting phases')
 
-  const nonVotingPhases = await Phase.filter({hasVoting: false}).hasFields('practiceGoalNumber')
+  const nonVotingPhases = await Phase.filter(row => r.and(
+    row('hasVoting').eq(false),
+    row('practiceGoalNumber').default(null).eq(null).not(),
+  ))
   if (nonVotingPhases.length === 0) {
     console.log('No non-voting phases found; skipped')
     return []
