@@ -73,17 +73,22 @@ describe(testContext(__filename), function () {
 
   describe('when parent `createdAt` is a Tuesday and has no `startTimestamp`', function () {
     it('should return the date of Monday of same week', function () {
-      const parent = {createdAt: new Date()}
+      const parent = {createdAt: new Date(2017, 8, 19)}
       const result = resolveWeekStartedAt(parent)
       _expectDateEqualToSameMonday(parent.createdAt, result)
     })
   })
 
   describe('when parent has neither `startTimestamp` nor `createdAt`', function () {
-    it('should return the date of Monday of current week', function () {
+    it('should follow rules for current day of the week', function () {
       const parent = {}
       const result = resolveWeekStartedAt(parent)
-      _expectDateEqualToCurrentMonday(result)
+      const currentDay = moment()
+      if (currentDay.isoWeekday() < 4) { // mon - thu
+        _expectDateEqualToCurrentMonday(result)
+      } else {
+        _expectDateEqualToFollowingMonday(currentDay, result)
+      }
     })
   })
 })
