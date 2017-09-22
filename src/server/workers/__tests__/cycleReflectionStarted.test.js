@@ -18,15 +18,19 @@ describe(testContext(__filename), function () {
 
   describe('processCycleReflectionStarted()', function () {
     const chatService = require('src/server/services/chatService')
+    const {Phase} = require('src/server/services/dataService')
+
     const {processCycleReflectionStarted} = require('../cycleReflectionStarted')
+
     describe('when reflection has started', function () {
       describe('for phases having retrospective', function () {
         beforeEach('setup data & mocks', async function () {
           useFixture.nockClean()
           this.cycle = await factory.create('cycle', {state: 'PRACTICE'})
           this.phase = await factory.create('phase', {
+            number: 50,
             hasRetrospective: true,
-            channelName: '#phase-channel-4'
+            channelName: '#phase-50'
           })
           this.project = await factory.createMany('project', {
             phaseId: this.phase.id,
@@ -53,20 +57,16 @@ describe(testContext(__filename), function () {
         beforeEach('setup data and mocks', async function () {
           useFixture.nockClean()
           this.cycle = await factory.create('cycle', {state: 'PRACTICE'})
-          this.phase = await factory.create('phase', {
-            hasRetrospective: false,
-            channelName: '#phase-channel-2'
-          })
-          this.project = await factory.createMany('project', {
-            phaseId: this.phase.id,
-            cycleId: this.cycle.id,
-          }, 1)
+          await factory.create('phase', {hasRetrospective: true})
+          const nonRetroPhase = await factory.create('phase', {hasRetrospective: false})
+          this.project = await factory.create('project', {phaseId: nonRetroPhase.id, cycleId: this.cycle.id})
           this.users = await mockIdmUsersById(this.project.memberIds, null, {times: 10})
         })
 
-        it('channels in phases with no retrospective do not get announcement', async function () {
+        it('phase channels do not get announcements', async function () {
+          const numRetroPhases = await Phase.filter({hasRetrospective: true}).count().execute()
           await processCycleReflectionStarted(this.cycle)
-          expect(chatService.sendChannelMessage.callCount).to.eq(2)
+          expect(chatService.sendChannelMessage.callCount).to.eq(numRetroPhases)
         })
       })
     })
