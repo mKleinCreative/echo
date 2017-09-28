@@ -9,7 +9,7 @@ export default async function updateUser(userId, values) {
 
   if (typeof phaseNumber !== 'undefined') {
     const phase = phaseNumber === null ? null : (await Phase.filter({number: phaseNumber}))[0]
-    await Member.get(values.id).update({phaseId: phase.id})
+    await Member.get(values.id).update({phaseId: phase ? phase.id : null})
   }
 
   if (Array.isArray(roles) && !_identicalRoles(user.roles, roles)) {
