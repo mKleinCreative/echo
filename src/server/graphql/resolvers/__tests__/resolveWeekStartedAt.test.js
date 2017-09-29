@@ -84,7 +84,7 @@ describe(testContext(__filename), function () {
       const parent = {}
       const result = resolveWeekStartedAt(parent)
       const currentDay = moment()
-      if (currentDay.isoWeekday() < 4) { // mon - thu
+      if (currentDay.isoWeekday() <= 4) { // mon - thu
         _expectDateEqualToCurrentMonday(result)
       } else {
         _expectDateEqualToFollowingMonday(currentDay, result)
