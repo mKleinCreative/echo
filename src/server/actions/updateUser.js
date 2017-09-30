@@ -1,22 +1,23 @@
 import getUser from 'src/server/actions/getUser'
-import {Member, Phase} from 'src/server/services/dataService'
-import {updateUser as idmUpdateUser} from 'src/server/services/idmService'
 
 export default async function updateUser(userId, values) {
+  const {Member, Phase} = require('src/server/services/dataService')
+  const {updateUser: idmUpdateUser} = require('src/server/services/idmService')
+
   const {phaseNumber, roles} = values || {}
 
   const user = await getUser(userId)
 
   if (typeof phaseNumber !== 'undefined') {
     const phase = phaseNumber === null ? null : (await Phase.filter({number: phaseNumber}))[0]
-    await Member.get(values.id).update({phaseId: phase ? phase.id : null})
+    await Member.get(userId).update({phaseId: phase ? phase.id : null})
   }
 
   if (Array.isArray(roles) && !_identicalRoles(user.roles, roles)) {
     await idmUpdateUser({
       id: userId,
       email: user.email,
-      name: user.name, // FIXME: should not have to include unchanged values
+      name: user.name,
       roles,
     })
   }
