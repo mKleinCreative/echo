@@ -11,7 +11,7 @@ export default {
       type: new GraphQLNonNull(SurveyResponseInput)
     }
   },
-  async resolve(source, {response}, ast) {
-    return await resolveSaveRetrospectiveSurveyResponses(source, {responses: [response]}, ast)
+  async resolve(source, {response}, context) {
+    return resolveSaveRetrospectiveSurveyResponses(source, {responses: [response]}, context)
   }
 }

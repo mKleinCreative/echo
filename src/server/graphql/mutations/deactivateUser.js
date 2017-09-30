@@ -10,7 +10,7 @@ export default {
   args: {
     identifier: {type: new GraphQLNonNull(GraphQLID), description: 'The user ID'}
   },
-  async resolve(source, {identifier}, {rootValue: {currentUser}}) {
+  async resolve(source, {identifier}, {currentUser}) {
     if (!userCan(currentUser, 'deactivateUser')) {
       throw new LGNotAuthorizedError('You are not authorized to deactivate users.')
     }

@@ -7,8 +7,9 @@ import {resetDB, runGraphQLQuery, useFixture} from 'src/test/helpers'
 import {expectArraysToContainTheSameElements} from 'src/test/helpers/expectations'
 import {Project} from 'src/server/services/dataService'
 
-import fields from '../index'
+import findProjectsForCycle from '../findProjectsForCycle'
 
+const fields = {findProjectsForCycle}
 const query = `
   query($cycleNumber: Int) {
     findProjectsForCycle(cycleNumber: $cycleNumber) {
@@ -43,12 +44,9 @@ describe(testContext(__filename), function () {
   })
 
   it('returns correct projects for cycle number', async function () {
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {cycleNumber: this.cycle.number},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {cycleNumber: this.cycle.number}
+    const result = await runGraphQLQuery(fields, query, context, variables)
     const returnedProjects = result.data.findProjectsForCycle
     expect(returnedProjects.length).to.equal(this.projects.length)
     expect(returnedProjects.find(p => p.id === this.projects[0].id)).to.be.ok
@@ -60,18 +58,15 @@ describe(testContext(__filename), function () {
   it('returns projects for current cycle no cycle number specified', async function () {
     const currentCycleProjects = await Project.filter({cycleId: this.cycle.id})
     useFixture.nockIDMGetUser(this.currentUser)
-    const {data: {findProjectsForCycle: result}} = await runGraphQLQuery(
-      query,
-      fields,
-      null,
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const {data: {findProjectsForCycle: result}} = await runGraphQLQuery(fields, query, context)
     expect(result.length).to.equal(currentCycleProjects.length)
     expectArraysToContainTheSameElements(currentCycleProjects.map(p => p.id), result.map(p => p.id))
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, null, {currentUser: null})
+    const context = {currentUser: null}
+    const result = runGraphQLQuery(fields, query, context)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

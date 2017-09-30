@@ -4,8 +4,9 @@
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery} from 'src/test/helpers'
 
-import fields from '../index'
+import getChapter from '../getChapter'
 
+const fields = {getChapter}
 const query = `
   query($identifier: String!) {
     getChapter(identifier: $identifier) {
@@ -26,12 +27,9 @@ describe(testContext(__filename), function () {
   it('returns correct chapter for identifier', async function () {
     const chapters = await factory.createMany('chapter', 2)
     const chapter = chapters[0]
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifier: chapter.id},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: chapter.id}
+    const result = await runGraphQLQuery(fields, query, context, variables)
     const returned = result.data.getChapter
     expect(returned.id).to.equal(chapter.id)
     expect(returned.name).to.equal(chapter.name)
@@ -39,17 +37,16 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if chapter is not found', function () {
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {identifier: ''},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/Chapter not found/i)
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, {identifier: ''}, {currentUser: null})
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

@@ -7,8 +7,9 @@ import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery, useFixture} from 'src/test/helpers'
 import {FEEDBACK_TYPE_DESCRIPTORS} from 'src/common/models/feedbackType'
 
-import fields from '../index'
+import getProjectSummary from '../getProjectSummary'
 
+const fields = {getProjectSummary}
 const query = `
   query($identifier: String!) {
     getProjectSummary(identifier: $identifier) {
@@ -43,12 +44,10 @@ describe(testContext(__filename), function () {
   it('returns correct summary for project identifier', async function () {
     useFixture.nockIDMFindUsers(this.users)
 
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifier: this.project.id},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: this.project.id}
+    const result = await runGraphQLQuery(fields, query, context, variables)
+
     const returned = result.data.getProjectSummary
     expect(returned.project.id).to.equal(this.project.id)
     expect(returned.project.chapter.id).to.equal(this.project.chapterId)
@@ -56,17 +55,16 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if project is not found', function () {
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {identifier: ''},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/Project not found/i)
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, {identifier: ''}, {currentUser: null})
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

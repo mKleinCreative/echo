@@ -10,7 +10,6 @@ import rootSchema from './rootSchema'
 
 const app = new express.Router()
 const sentry = new raven.Client(config.server.sentryDSN)
-
 const corsOptions = {
   origin: [
     /\.learnersguild.org/,
@@ -18,9 +17,11 @@ const corsOptions = {
   ],
   exposedHeaders: ['LearnersGuild-JWT'],
 }
+
 app.use('/graphql', cors(corsOptions), graphqlHTTP(req => ({
   schema: rootSchema,
-  rootValue: {currentUser: req.user},
+  context: {currentUser: req.user},
+  rootValue: {},
   pretty: true,
   formatError: error => {
     const serverError = formatServerError(error)

@@ -28,7 +28,7 @@ export function resolvePhase(parent) {
     (parent.phaseId ? _safeResolveAsync(Phase.get(parent.phaseId)) : null)
 }
 
-export async function resolvePhaseCurrentProjects(phaseSummary, args, {rootValue: {currentUser}}) {
+export async function resolvePhaseCurrentProjects(phaseSummary, args, {currentUser}) {
   if (phaseSummary.currentProjects) {
     return phaseSummary.currentProjects
   }
@@ -80,7 +80,7 @@ export function resolveCycle(parent) {
   )
 }
 
-export async function resolveFindProjectsForCycle(source, args = {}, {rootValue: {currentUser}}) {
+export async function resolveFindProjectsForCycle(source, args = {}, {currentUser}) {
   if (!userCan(currentUser, 'findProjects')) {
     throw new LGNotAuthorizedError()
   }
@@ -135,7 +135,7 @@ export function resolveProjectMembers(project) {
   return findUsers(project.memberIds)
 }
 
-export async function resolveProjectUserSummaries(projectSummary, args, {rootValue: {currentUser}}) {
+export async function resolveProjectUserSummaries(projectSummary, args, {currentUser}) {
   const {project} = projectSummary
   if (!project) {
     throw new Error('Invalid project for user summaries')
@@ -169,7 +169,7 @@ export function resolveWeekStartedAt(parent) {
     parentStartedAt.startOf('isoweek').toDate()
 }
 
-export async function resolveUser(source, {identifier}, {rootValue: {currentUser}}) {
+export async function resolveUser(source, {identifier}, {currentUser}) {
   if (!userCan(currentUser, 'viewUser')) {
     throw new LGNotAuthorizedError()
   }
@@ -180,7 +180,7 @@ export async function resolveUser(source, {identifier}, {rootValue: {currentUser
   return user
 }
 
-export async function resolveUserProjectSummaries(userSummary, args, {rootValue: {currentUser}}) {
+export async function resolveUserProjectSummaries(userSummary, args, {currentUser}) {
   const {user} = userSummary
   if (!user) {
     throw new Error('Invalid user for project summaries')
@@ -231,12 +231,12 @@ async function getUserProjectSummary(user, project, projectUserMap, currentUser)
   }
 }
 
-export async function resolveSubmitSurvey(source, {surveyId}, {rootValue: {currentUser}}) {
+export async function resolveSubmitSurvey(source, {surveyId}, {currentUser}) {
   await handleSubmitSurvey(surveyId, currentUser.id)
   return {success: true}
 }
 
-export async function resolveSaveRetrospectiveSurveyResponses(source, {responses}, {rootValue: {currentUser}}) {
+export async function resolveSaveRetrospectiveSurveyResponses(source, {responses}, {currentUser}) {
   _assertUserAuthorized(currentUser, 'saveResponse')
   await _assertCurrentUserCanSubmitResponsesForRespondent(currentUser, responses)
   return handleSubmitSurveyResponses(responses)

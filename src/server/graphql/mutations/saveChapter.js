@@ -11,7 +11,7 @@ export default {
   args: {
     chapter: {type: new GraphQLNonNull(InputChapter)},
   },
-  async resolve(source, {chapter}, {rootValue: {currentUser}}) {
+  async resolve(source, {chapter}, {currentUser}) {
     if (chapter.id && !userCan(currentUser, 'updateChapter') || !chapter.id && !userCan(currentUser, 'createChapter')) {
       throw new LGNotAuthorizedError()
     }

@@ -4,7 +4,23 @@
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLMutation} from 'src/test/helpers'
 
-import fields from '../index'
+import saveChapter from '../saveChapter'
+
+const fields = {saveChapter}
+const query = `
+  mutation($chapter: InputChapter!) {
+    saveChapter(chapter: $chapter) {
+      id
+      name
+      channelName
+      timezone
+      githubTeamId
+      inviteCodes
+      createdAt
+      updatedAt
+    }
+  }
+`
 
 describe(testContext(__filename), function () {
   beforeEach(resetDB)
@@ -15,26 +31,6 @@ describe(testContext(__filename), function () {
       this.member = await factory.create('member', {id: this.user.id})
     })
 
-    before(function () {
-      this.saveChapter = function (inputChapter) {
-        return runGraphQLMutation(
-          `mutation($chapter: InputChapter!) { saveChapter(chapter: $chapter) {
-            id
-            name
-            channelName
-            timezone
-            githubTeamId
-            inviteCodes
-            createdAt
-            updatedAt
-          }}`,
-          fields,
-          {chapter: inputChapter},
-          {currentUser: this.user},
-        )
-      }
-    })
-
     it('creates a new chapter', async function () {
       const {
         name,
@@ -43,12 +39,10 @@ describe(testContext(__filename), function () {
         inviteCodes,
       } = await factory.build('chapter', {name: 'justachaptername'})
 
-      const result = await this.saveChapter({
-        name,
-        channelName,
-        timezone,
-        inviteCodes,
-      })
+      const context = {currentUser: this.user}
+      const variables = {chapter: {name, channelName, timezone, inviteCodes}}
+
+      const result = await runGraphQLMutation(fields, query, context, variables)
 
       const newChapter = result.data.saveChapter
       expect(newChapter).to.have.property('name').eq(name)

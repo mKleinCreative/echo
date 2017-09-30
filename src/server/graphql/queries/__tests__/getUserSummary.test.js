@@ -5,8 +5,9 @@ import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery, useFixture} from 'src/test/helpers'
 import {FEEDBACK_TYPE_DESCRIPTORS} from 'src/common/models/feedbackType'
 
-import fields from '../index'
+import getUserSummary from '../getUserSummary'
 
+const fields = {getUserSummary}
 const query = `
   query($identifier: String!) {
     getUserSummary(identifier: $identifier) {
@@ -36,12 +37,9 @@ describe(testContext(__filename), function () {
   it('returns correct summary for user identifier', async function () {
     useFixture.nockIDMGetUser(this.user)
     const member = await factory.create('member', {id: this.user.id})
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifier: member.id},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: member.id}
+    const result = await runGraphQLQuery(fields, query, context, variables)
     const returned = result.data.getUserSummary
     expect(returned.user.id).to.equal(this.user.id)
     expect(returned.user.handle).to.equal(this.user.handle)
@@ -51,22 +49,16 @@ describe(testContext(__filename), function () {
 
   it('throws an error if user is not found', function () {
     useFixture.nockIDMGetUser(this.user)
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {identifier: ''},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/User not found/i)
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {identifier: ''},
-      {currentUser: null}
-    )
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

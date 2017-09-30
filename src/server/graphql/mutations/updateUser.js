@@ -10,7 +10,7 @@ export default {
   args: {
     values: {type: new GraphQLNonNull(InputUser)},
   },
-  async resolve(source, {values}, {rootValue: {currentUser}}) {
+  async resolve(source, {values}, {currentUser}) {
     if (!userCan(currentUser, 'updateUser')) {
       throw new LGNotAuthorizedError()
     }

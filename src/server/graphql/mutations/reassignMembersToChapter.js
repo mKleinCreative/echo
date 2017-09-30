@@ -13,7 +13,7 @@ export default {
     memberIds: {type: new GraphQLList(GraphQLID)},
     chapterId: {type: new GraphQLNonNull(GraphQLID)},
   },
-  async resolve(source, {memberIds, chapterId}, {rootValue: {currentUser}}) {
+  async resolve(source, {memberIds, chapterId}, {currentUser}) {
     if (!userCan(currentUser, 'reassignMembersToChapter')) {
       throw new LGNotAuthorizedError()
     }

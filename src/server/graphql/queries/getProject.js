@@ -10,7 +10,7 @@ export default {
   args: {
     identifier: {type: new GraphQLNonNull(GraphQLString), description: 'The project ID or name'}
   },
-  async resolve(source, {identifier}, {rootValue: {currentUser}}) {
+  async resolve(source, {identifier}, {currentUser}) {
     if (!userCan(currentUser, 'viewProject')) {
       throw new LGNotAuthorizedError()
     }

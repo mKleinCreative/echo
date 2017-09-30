@@ -11,7 +11,7 @@ export default {
   args: {
     identifiers: {type: new GraphQLList(GraphQLString), description: 'A list of project identifiers'},
   },
-  async resolve(source, args = {}, {rootValue: {currentUser}}) {
+  async resolve(source, args = {}, {currentUser}) {
     if (!userCan(currentUser, 'findProjects')) {
       throw new LGNotAuthorizedError()
     }

@@ -1,14 +1,15 @@
 /* eslint-env mocha */
 /* global expect, testContext */
 /* eslint-disable prefer-arrow-callback, no-unused-expressions */
-
 import nock from 'nock'
 
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery, useFixture, mockIdmUsersById} from 'src/test/helpers'
 import {Survey} from 'src/server/services/dataService'
 
-import fields from '../index'
+import getRetrospectiveSurvey from '../getRetrospectiveSurvey'
+
+const fields = {getRetrospectiveSurvey}
 
 describe(testContext(__filename), function () {
   useFixture.buildSurvey()
@@ -39,8 +40,9 @@ describe(testContext(__filename), function () {
 
   describe('getRetrospectiveSurvey', function () {
     it('returns the survey for the correct cycle and project for the current user', async function () {
-      const result = await runGraphQLQuery(
-        `query {
+      const context = {currentUser: this.currentUser}
+      const query = `
+        query {
           getRetrospectiveSurvey {
             id
             project {
@@ -61,11 +63,8 @@ describe(testContext(__filename), function () {
             }
           }
         }
-        `,
-        fields,
-        undefined,
-        {currentUser: this.currentUser}
-      )
+      `
+      const result = await runGraphQLQuery(fields, query, context)
       expect(result.data.getRetrospectiveSurvey.id).to.eq(this.survey.id)
       expect(result.data.getRetrospectiveSurvey.project.name).to.eq(this.project.name)
       expect(result.data.getRetrospectiveSurvey.project.cycle.id).to.eq(this.cycleId)
@@ -75,8 +74,9 @@ describe(testContext(__filename), function () {
     })
 
     it('treats the question body like a template', async function () {
-      const result = await runGraphQLQuery(
-        `query {
+      const context = {currentUser: this.currentUser}
+      const query = `
+        query {
           getRetrospectiveSurvey {
             questions {
               body
@@ -84,35 +84,37 @@ describe(testContext(__filename), function () {
             }
           }
         }
-        `,
-        fields,
-        undefined,
-        {currentUser: this.currentUser}
-      )
+      `
+      const result = await runGraphQLQuery(fields, query, context)
       const question = result.data.getRetrospectiveSurvey.questions[1]
       expect(question.body).to.contain(`@${question.subjects[0].handle}`)
     })
 
     it('accepts a projectName parameter', async function () {
-      const result = await runGraphQLQuery(
-        `query($projectName: String) {
-          getRetrospectiveSurvey(projectName: $projectName) { id }
+      const context = {currentUser: this.currentUser}
+      const variables = {projectName: this.project.name}
+      const query = `
+        query($projectName: String) {
+          getRetrospectiveSurvey(projectName: $projectName) {
+            id
+          }
         }
-        `,
-        fields,
-        {projectName: this.project.name},
-        {currentUser: this.currentUser}
-      )
+      `
+      const result = await runGraphQLQuery(fields, query, context, variables)
       expect(result.data.getRetrospectiveSurvey.id).to.eq(this.survey.id)
     })
 
     it('returns a meaningful error when lookup fails', async function () {
       await Survey.get(this.survey.id).delete().execute()
-      const promise = runGraphQLQuery('query { getRetrospectiveSurvey { id } }',
-        fields,
-        undefined,
-        {currentUser: this.currentUser}
-      )
+      const context = {currentUser: this.currentUser}
+      const query = `
+        query {
+          getRetrospectiveSurvey {
+            id
+          }
+        }
+      `
+      const promise = runGraphQLQuery(fields, query, context)
       expect(promise).to.be.rejectedWith(/no retrospective survey/)
     })
   })

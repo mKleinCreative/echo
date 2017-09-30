@@ -16,12 +16,12 @@ describe(testContext(__filename), function () {
     await this.buildSurvey()
     const memberId = this.project.memberIds[0]
     this.currentUser = await factory.build('user', {id: memberId})
-    this.ast = {rootValue: {currentUser: this.currentUser}}
+    this.context = {currentUser: this.currentUser}
   })
 
   it('saves a response', async function () {
     const args = _buildArgsWithResponse(this)
-    const {createdIds: [returnedResponseId]} = await resolveSaveRetrospectiveSurveyResponses(null, args, this.ast)
+    const {createdIds: [returnedResponseId]} = await resolveSaveRetrospectiveSurveyResponses(null, args, this.context)
 
     const response = await Response.get(returnedResponseId)
     return expect(response).to.exist
@@ -32,7 +32,7 @@ describe(testContext(__filename), function () {
     const args = _buildArgsWithResponse(this, {respondentId: otherMemberId})
 
     await expect(
-      resolveSaveRetrospectiveSurveyResponses(null, args, this.ast)
+      resolveSaveRetrospectiveSurveyResponses(null, args, this.context)
     ).to.be.rejectedWith(/You cannot submit responses for other members/)
   })
 
@@ -41,7 +41,7 @@ describe(testContext(__filename), function () {
     const args = _buildArgsWithResponse(this)
 
     await expect(
-      resolveSaveRetrospectiveSurveyResponses(null, args, this.ast)
+      resolveSaveRetrospectiveSurveyResponses(null, args, this.context)
     ).to.be.rejectedWith(/not authorized/)
   })
 })

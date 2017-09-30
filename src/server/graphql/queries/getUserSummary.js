@@ -10,13 +10,13 @@ export default {
   args: {
     identifier: {type: new GraphQLNonNull(GraphQLString), description: 'The user ID or handle'},
   },
-  async resolve(source, args, ast) {
-    if (!userCan(ast.rootValue.currentUser, 'viewUserSummary')) {
+  async resolve(source, args, context) {
+    if (!userCan(context.currentUser, 'viewUserSummary')) {
       throw new LGNotAuthorizedError()
     }
 
     return {
-      user: await resolveUser(source, args, ast),
+      user: await resolveUser(source, args, context),
     }
   }
 }

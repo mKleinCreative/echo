@@ -10,8 +10,9 @@ import {
   expectArraysToContainTheSameElements,
 } from 'src/test/helpers'
 
-import fields from '../index'
+import findPhaseSummaries from '../findPhaseSummaries'
 
+const fields = {findPhaseSummaries}
 const query = `
   query {
     findPhaseSummaries {
@@ -60,12 +61,8 @@ describe(testContext(__filename), function () {
   })
 
   it('returns all phase summaries', async function () {
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      null,
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const result = await runGraphQLQuery(fields, query, context)
 
     const phaseSummaries = result.data.findPhaseSummaries
     expect(phaseSummaries.length).to.eq(this.phases.length)
@@ -80,7 +77,9 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, {identifier: ''}, {currentUser: null})
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

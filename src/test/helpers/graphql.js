@@ -1,35 +1,37 @@
-import {graphql, GraphQLString, GraphQLSchema, GraphQLObjectType} from 'graphql'
+import {graphql, GraphQLSchema, GraphQLObjectType, GraphQLString} from 'graphql'
 
 const noopQuery = new GraphQLObjectType({name: 'Query', fields: () => ({
-  noop: {
-    type: GraphQLString,
-    resolve: () => null,
-  }
+  noop: {type: GraphQLString, resolve: () => null},
 })})
 
-function runGraphQL(schema, graphqlQueryString, rootQuery, args) {
-  return graphql(schema, graphqlQueryString, rootQuery, args)
-    .then(result => {
-      if (result.errors) {
-        throw new Error(result.errors.map(err => err.message).join('\n'))
-      }
-      return result
-    })
+export function runGraphQLQuery(
+  fields,
+  query,
+  context = {currentUser: true},
+  variables,
+) {
+  const schema = new GraphQLSchema({query: new GraphQLObjectType({name: 'RootQuery', fields})})
+  return _graphql(schema, query, context, variables)
 }
 
-export function runGraphQLQuery(graphqlQueryString, fields, args = undefined, rootQuery = {currentUser: true}) {
-  const query = new GraphQLObjectType({name: 'Query', fields})
-  const schema = new GraphQLSchema({query})
-
-  return runGraphQL(schema, graphqlQueryString, rootQuery, args)
-}
-
-export function runGraphQLMutation(graphqlQueryString, fields, args = undefined, rootQuery = {currentUser: true}) {
-  const mutation = new GraphQLObjectType({name: 'Mutation', fields})
+export function runGraphQLMutation(
+  fields,
+  mutation,
+  context = {currentUser: true},
+  variables,
+) {
   const schema = new GraphQLSchema({
-    query: noopQuery, // GraphQL really wants you to have a query, even if it's not used
-    mutation
+    query: noopQuery,
+    mutation: new GraphQLObjectType({name: 'RootMutation', fields})
   })
+  return _graphql(schema, mutation, context, variables)
+}
 
-  return runGraphQL(schema, graphqlQueryString, rootQuery, args)
+async function _graphql(schema, request, context, variables) {
+  const rootValue = {}
+  const result = await graphql(schema, request, rootValue, context, variables)
+  if (result.errors) {
+    throw new Error(result.errors.map(err => err.message).join('\n'))
+  }
+  return result
 }

@@ -1,13 +1,14 @@
 /* eslint-env mocha */
 /* global expect, testContext */
 /* eslint-disable prefer-arrow-callback, no-unused-expressions */
-
 import nock from 'nock'
 
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery, useFixture, mockIdmUsersById} from 'src/test/helpers'
 
-import fields from '../index'
+import getRetrospectiveSurveyQuestion from '../getRetrospectiveSurveyQuestion'
+
+const fields = {getRetrospectiveSurveyQuestion}
 
 describe(testContext(__filename), function () {
   useFixture.buildSurvey()
@@ -40,18 +41,17 @@ describe(testContext(__filename), function () {
     it('gets a single question from the survey by index', async function () {
       const questionNumber = 2 // <-- 1-based arg
       const questionIndex = 1 // <-- 0-based index
-      const result = await runGraphQLQuery(
-        `query($questionNumber: Int!) {
+      const context = {currentUser: this.currentUser}
+      const variables = {questionNumber}
+      const query = `
+        query($questionNumber: Int!) {
           getRetrospectiveSurveyQuestion(questionNumber: $questionNumber) {
             id subjectType responseType body
             subjects { id name handle }
           }
         }
-        `,
-        fields,
-        {questionNumber},
-        {currentUser: this.currentUser}
-      )
+      `
+      const result = await runGraphQLQuery(fields, query, context, variables)
       expect(result.data.getRetrospectiveSurveyQuestion)
         .to.have.property('id', this.survey.questionRefs[questionIndex].questionId)
     })
@@ -59,17 +59,16 @@ describe(testContext(__filename), function () {
     it('accepts a projectName parameter', async function () {
       const questionNumber = 2 // <-- 1-based arg
       const questionIndex = 1 // <-- 0-based index
-      const result = await runGraphQLQuery(
-        `query($questionNumber: Int!, $projectName: String) {
+      const context = {currentUser: this.currentUser}
+      const variables = {questionNumber, projectName: this.project.name}
+      const query = `
+        query($questionNumber: Int!, $projectName: String) {
           getRetrospectiveSurveyQuestion(questionNumber: $questionNumber, projectName: $projectName) {
             id
           }
         }
-        `,
-        fields,
-        {questionNumber, projectName: this.project.name},
-        {currentUser: this.currentUser}
-      )
+      `
+      const result = await runGraphQLQuery(fields, query, context, variables)
       expect(result.data.getRetrospectiveSurveyQuestion)
         .to.have.property('id', this.survey.questionRefs[questionIndex].questionId)
     })

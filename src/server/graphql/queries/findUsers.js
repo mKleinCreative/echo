@@ -11,7 +11,7 @@ export default {
   args: {
     identifiers: {type: new GraphQLList(GraphQLString)},
   },
-  async resolve(source, {identifiers}, {rootValue: {currentUser}}) {
+  async resolve(source, {identifiers}, {currentUser}) {
     if (!userCan(currentUser, 'findUsers')) {
       throw new LGNotAuthorizedError()
     }
