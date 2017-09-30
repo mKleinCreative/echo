@@ -7,7 +7,7 @@ import {LGNotAuthorizedError} from 'src/server/util/error'
 
 export default {
   type: new GraphQLList(Survey),
-  async resolve(source, args, {rootValue: {currentUser}}) {
+  async resolve(source, args, {currentUser}) {
     if (!currentUser || !userCan(currentUser, 'findRetrospectiveSurveys')) {
       throw new LGNotAuthorizedError()
     }

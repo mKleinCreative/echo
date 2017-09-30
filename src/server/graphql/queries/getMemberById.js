@@ -9,7 +9,7 @@ export default {
   args: {
     id: {type: new GraphQLNonNull(GraphQLID)}
   },
-  async resolve(source, args, {rootValue: {currentUser}}) {
+  async resolve(source, args, {currentUser}) {
     if (!currentUser) {
       throw new LGNotAuthorizedError()
     }

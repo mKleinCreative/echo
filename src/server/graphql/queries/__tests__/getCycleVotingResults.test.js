@@ -6,7 +6,37 @@ import config from 'src/config'
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery} from 'src/test/helpers'
 
-import fields from '../index'
+import getCycleVotingResults from '../getCycleVotingResults'
+
+const fields = {getCycleVotingResults}
+const query = `
+  query($cycleId: ID!) {
+    getCycleVotingResults(
+      cycleId: $cycleId
+    )
+    {
+      cycle {
+        id,
+        state
+      },
+      pools {
+        id,
+        name,
+        phase {
+          id
+          number
+        },
+        users { id },
+        voterMemberIds,
+        candidateGoals {
+          goal {url},
+          memberGoalRanks { memberId, goalRank }
+        },
+        votingIsStillOpen,
+      }
+    }
+  }
+`
 
 describe(testContext(__filename), function () {
   beforeEach(resetDB)
@@ -33,37 +63,9 @@ describe(testContext(__filename), function () {
   })
 
   const getCycleVotingResults = function (currentUser = this.currentUser) {
-    return runGraphQLQuery(
-      `query($cycleId: ID!) {
-        getCycleVotingResults(
-          cycleId: $cycleId
-        )
-        {
-          cycle {
-            id,
-            state
-          },
-          pools {
-            id,
-            name,
-            phase {
-              id
-              number
-            },
-            users { id },
-            voterMemberIds,
-            candidateGoals {
-              goal {url},
-              memberGoalRanks { memberId, goalRank }
-            },
-            votingIsStillOpen,
-          }
-        }
-      }`,
-      fields,
-      {cycleId: this.cycle.id},
-      {currentUser},
-    )
+    const context = {currentUser}
+    const variables = {cycleId: this.cycle.id}
+    return runGraphQLQuery(fields, query, context, variables)
   }
 
   describe('when there are votes', function () {

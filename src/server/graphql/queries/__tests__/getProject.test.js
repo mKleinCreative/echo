@@ -4,8 +4,9 @@
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery} from 'src/test/helpers'
 
-import fields from '../index'
+import getProject from '../getProject'
 
+const fields = {getProject}
 const query = `
   query($identifier: String!) {
     getProject(identifier: $identifier) {
@@ -27,12 +28,9 @@ describe(testContext(__filename), function () {
   it('returns correct project for identifier', async function () {
     const projects = await factory.createMany('project', 2)
     const project = projects[0]
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifier: project.id},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: project.id}
+    const result = await runGraphQLQuery(fields, query, context, variables)
     const returnedProject = result.data.getProject
     expect(returnedProject.id).to.equal(project.id)
     expect(returnedProject.chapter.id).to.equal(project.chapterId)
@@ -40,17 +38,16 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if project is not found', function () {
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {identifier: ''},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/Project not found/i)
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, {identifier: ''}, {currentUser: null})
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

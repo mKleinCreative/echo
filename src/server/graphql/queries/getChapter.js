@@ -9,7 +9,7 @@ export default {
   args: {
     identifier: {type: new GraphQLNonNull(GraphQLString), description: 'The chapter ID'}
   },
-  async resolve(source, {identifier}, {rootValue: {currentUser}}) {
+  async resolve(source, {identifier}, {currentUser}) {
     if (!currentUser) {
       throw new LGNotAuthorizedError()
     }

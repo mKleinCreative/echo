@@ -6,7 +6,7 @@ import {LGNotAuthorizedError} from 'src/server/util/error'
 
 export default {
   type: new GraphQLList(ChapterSchema),
-  async resolve(source, args, {rootValue: {currentUser}}) {
+  async resolve(source, args, {currentUser}) {
     if (!currentUser) {
       throw new LGNotAuthorizedError()
     }

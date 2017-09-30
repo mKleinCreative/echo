@@ -14,7 +14,7 @@ export default {
       description: 'The name of the project whose retrospective survey should be returned. Required if the current user is in more than one project this cycle.'
     }
   },
-  async resolve(source, {projectName}, {rootValue: {currentUser}}) {
+  async resolve(source, {projectName}, {currentUser}) {
     if (!currentUser || !userCan(currentUser, 'getRetrospectiveSurvey')) {
       throw new LGNotAuthorizedError()
     }

@@ -4,8 +4,9 @@
 import factory from 'src/test/factories'
 import {resetDB, runGraphQLQuery, useFixture} from 'src/test/helpers'
 
-import fields from '../index'
+import findUsers from '../findUsers'
 
+const fields = {findUsers}
 const query = `
   query($identifiers: [String]) {
     findUsers(identifiers: $identifiers) {
@@ -29,12 +30,9 @@ describe(testContext(__filename), function () {
     const member = this.member
     const user = this.users[0]
     useFixture.nockIDMFindUsers([user])
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifiers: [member.id]},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifiers: [member.id]}
+    const result = await runGraphQLQuery(fields, query, context, variables)
     expect(result.data.findUsers.length).to.equal(1)
     const [returned] = result.data.findUsers
     expect(returned.id).to.equal(user.id)
@@ -44,7 +42,8 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(query, fields, null, {currentUser: null})
+    const context = {currentUser: null}
+    const result = runGraphQLQuery(fields, query, context)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

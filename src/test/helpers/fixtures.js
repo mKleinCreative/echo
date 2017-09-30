@@ -119,6 +119,15 @@ export const useFixture = {
         },
       })
   },
+  nockIDMUpdateUser(user) {
+    this.apiScope = nock(config.server.idm.baseURL)
+      .post('/graphql')
+      .reply(200, {
+        data: {
+          updateUser: user,
+        },
+      })
+  },
   nockIDMFindUsers(users, {times = 1} = {}) {
     this.apiScope = nock(config.server.idm.baseURL)
       .post('/graphql')

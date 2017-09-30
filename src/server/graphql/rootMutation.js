@@ -5,5 +5,5 @@ import rootFields from './mutations'
 
 export default new GraphQLObjectType({
   name: 'RootMutation',
-  fields: instrumentResolvers(rootFields, 'mutation')
+  fields: instrumentResolvers(rootFields, 'mutation'),
 })

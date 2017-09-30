@@ -18,7 +18,7 @@ export default {
       description: 'The projects id of the survey to lock for this given member',
     },
   },
-  async resolve(source, {memberId, projectId}, {rootValue: {currentUser}}) {
+  async resolve(source, {memberId, projectId}, {currentUser}) {
     if (!userCan(currentUser, 'lockAndUnlockSurveys')) {
       throw new LGNotAuthorizedError()
     }

@@ -6,8 +6,9 @@ import nock from 'nock'
 import {resetDB, runGraphQLQuery, useFixture, mockIdmUsersById} from 'src/test/helpers'
 import factory from 'src/test/factories'
 
-import fields from '../index'
+import findRetrospectiveSurveys from '../findRetrospectiveSurveys'
 
+const fields = {findRetrospectiveSurveys}
 const query = `
   query {
     findRetrospectiveSurveys {
@@ -45,22 +46,15 @@ describe(testContext(__filename), function () {
   })
 
   it('throws an error if user is not signed-in', function () {
-    const result = runGraphQLQuery(
-      query,
-      fields,
-      {id: 'fake.id'},
-      {currentUser: null}
-    )
+    const context = {currentUser: null}
+    const variables = {id: 'fake.id'}
+    const result = runGraphQLQuery(fields, query, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 
   it('returns the survey for the correct cycle and project for the current user', async function () {
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      undefined,
-      {currentUser: this.currentUser}
-    )
+    const context = {currentUser: this.currentUser}
+    const result = await runGraphQLQuery(fields, query, context)
     const data = result.data.findRetrospectiveSurveys
     expect(data.length).to.eq(1)
     expect(data[0].id).to.eq(this.survey.id)

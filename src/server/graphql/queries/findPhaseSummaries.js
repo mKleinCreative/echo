@@ -7,7 +7,7 @@ import {LGNotAuthorizedError} from 'src/server/util/error'
 
 export default {
   type: new GraphQLList(PhaseSummary),
-  async resolve(source, {identifier}, {rootValue: {currentUser}}) {
+  async resolve(source, {identifier}, {currentUser}) {
     if (!userCan(currentUser, 'listPhaseSummaries')) {
       throw new LGNotAuthorizedError()
     }

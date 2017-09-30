@@ -10,7 +10,7 @@ export default {
   args: {
     cycleId: {type: GraphQLID}
   },
-  async resolve(source, {cycleId}, {rootValue: {currentUser}}) {
+  async resolve(source, {cycleId}, {currentUser}) {
     // only signed-in users can view results
     if (!currentUser) {
       throw new LGNotAuthorizedError()

@@ -2,12 +2,13 @@
 /* global expect, testContext */
 /* eslint-disable prefer-arrow-callback, no-unused-expressions */
 import factory from 'src/test/factories'
-import {resetDB, runGraphQLQuery} from 'src/test/helpers'
+import {resetDB, runGraphQLMutation} from 'src/test/helpers'
 
-import fields from '../index'
+import deleteProject from '../deleteProject'
 
-const query = `
-  query($identifier: String!) {
+const fields = {deleteProject}
+const mutation = `
+  mutation($identifier: String!) {
     deleteProject(identifier: $identifier) {
       success
     }
@@ -23,17 +24,16 @@ describe(testContext(__filename), function () {
 
   it('returns success for valid identifier', async function () {
     const project = await factory.create('project')
-    const result = await runGraphQLQuery(
-      query,
-      fields,
-      {identifier: project.id},
-      {currentUser: this.currentUser},
-    )
+    const context = {currentUser: this.currentUser}
+    const variables = {identifier: project.id}
+    const result = await runGraphQLMutation(fields, mutation, context, variables)
     expect(result.data.deleteProject.success).to.equal(true)
   })
 
   it('throws an error if user is not authorized', function () {
-    const result = runGraphQLQuery(query, fields, {identifier: ''}, {currentUser: null})
+    const context = {currentUser: null}
+    const variables = {identifier: ''}
+    const result = runGraphQLMutation(fields, mutation, context, variables)
     return expect(result).to.eventually.be.rejectedWith(/not authorized/i)
   })
 })

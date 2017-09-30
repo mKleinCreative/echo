@@ -10,7 +10,7 @@ export default {
   args: {
     values: {type: new GraphQLNonNull(ProjectImport)},
   },
-  async resolve(source, {values}, {rootValue: {currentUser}}) {
+  async resolve(source, {values}, {currentUser}) {
     if (!userCan(currentUser, 'importProject')) {
       throw new LGNotAuthorizedError()
     }

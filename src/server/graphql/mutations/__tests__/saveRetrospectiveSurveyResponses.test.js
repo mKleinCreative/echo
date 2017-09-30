@@ -6,7 +6,16 @@ import {resetDB, runGraphQLMutation, useFixture} from 'src/test/helpers'
 import {Cycle} from 'src/server/services/dataService'
 import {COMPLETE, PRACTICE} from 'src/common/models/cycle'
 
-import fields from '../index'
+import saveRetrospectiveSurveyResponses from '../saveRetrospectiveSurveyResponses'
+
+const fields = {saveRetrospectiveSurveyResponses}
+const mutation = `
+  mutation($responses: [SurveyResponseInput]!) {
+    saveRetrospectiveSurveyResponses(responses: $responses) {
+      createdIds
+    }
+  }
+`
 
 describe(testContext(__filename), function () {
   useFixture.buildOneQuestionSurvey()
@@ -26,35 +35,28 @@ describe(testContext(__filename), function () {
         surveyId: this.survey.id,
         respondentId: this.respondentId,
       }))
-      return runGraphQLMutation(
-        `mutation($responses: [SurveyResponseInput]!) {
-          saveRetrospectiveSurveyResponses(responses: $responses) {
-            createdIds
-          }
-        }`,
-        fields,
-        {responses},
-        {currentUser: this.user},
-      )
+      const context = {currentUser: this.user}
+      const variables = {responses}
+      return runGraphQLMutation(fields, mutation, context, variables)
     }
   })
 
-  it('returns new response ids for all responses created in REFLECTION state', function () {
-    return this.invokeAPI()
-      .then(result => result.data.saveRetrospectiveSurveyResponses.createdIds)
-      .then(createdIds => expect(createdIds).have.length(this.project.memberIds.length - 1))
+  it('returns new response ids for all responses created in REFLECTION state', async function () {
+    const result = await this.invokeAPI()
+    const createdIds = result.data.saveRetrospectiveSurveyResponses.createdIds
+    expect(createdIds).have.length(this.project.memberIds.length - 1)
   })
 
   it('returns new response ids for all responses created in COMPLETE state', async function () {
     await Cycle.get(this.cycleId).updateWithTimestamp({state: COMPLETE})
-    return this.invokeAPI()
-      .then(result => result.data.saveRetrospectiveSurveyResponses.createdIds)
-      .then(createdIds => expect(createdIds).have.length(this.project.memberIds.length - 1))
+    const result = await this.invokeAPI()
+    const createdIds = result.data.saveRetrospectiveSurveyResponses.createdIds
+    expect(createdIds).have.length(this.project.memberIds.length - 1)
   })
 
   it('returns an error when in PRACTICE state', async function () {
     await Cycle.get(this.cycleId).updateWithTimestamp({state: PRACTICE})
-    return expect(this.invokeAPI())
-      .to.be.rejectedWith(/cycle is in the PRACTICE state/)
+    const result = this.invokeAPI()
+    return expect(result).to.be.rejectedWith(/cycle is in the PRACTICE state/)
   })
 })
